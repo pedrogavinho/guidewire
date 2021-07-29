@@ -1,0 +1,264 @@
+﻿{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Claims API",
+    "description": "Claims search API for Guidewire integration",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "https://mwfbi-internal-dev.azure-api.net/claim/v1"
+    }
+  ],
+  "paths": {
+    "/SearchForClaims": {
+      "get": {
+        "tags": [
+          "Search For Claims"
+        ],
+        "summary": "Claims Search",
+        "description": "Searches claims history",
+        "operationId": "Get-SearchForClaims",
+        "parameters": [
+          {
+            "name": "BeginDate",
+            "in": "query",
+            "description": "Beginning date of the search range. YYYY-MM-DD format. Required.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "EndDate",
+            "in": "query",
+            "description": "End date of the search range. YYYY-MM-DD format. Required.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "PolicyNumber",
+            "in": "query",
+            "description": "The policy number. Required.",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payload of Array of PCClaim",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/pcClaim"
+                  }
+                }
+              }
+            },
+            "x-ms-summary": "OK Response"
+          },
+          "400": {
+            "description": "Missing query parameter error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "x-ms-visibility": "important"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "pcAdjuster": {
+        "required": [
+          "DisplayName"
+        ],
+        "type": "object",
+        "properties": {
+          "DisplayName": {
+            "type": "string"
+          },
+          "PrimaryPhone": {
+            "type": "string"
+          }
+        }
+      },
+      "pcClaim": {
+        "required": [
+          "Adjuster",
+          "ClaimNumber",
+          "PolicyNumber",
+          "TotalIncurred",
+          "RemainingReserves",
+          "LitigationIndicator",
+          "FraudIndicator",
+          "LargeLossIndicator"
+        ],
+        "type": "object",
+        "properties": {
+          "Adjuster": {
+            "$ref": "#/components/schemas/pcAdjuster"
+          },
+          "ClaimNumber": {
+            "type": "string"
+          },
+          "ClaimPublicID": {
+            "type": "string"
+          },
+          "ClaimSecurityType": {
+            "enum": [
+              "Employee claim",
+              "Sensitive",
+              "Under Litigation"
+            ],
+            "type": "string",
+            "default": "Sensitive"
+          },
+          "FraudIndicator": {
+            "type": "boolean"
+          },
+          "LargeLossIndicator": {
+            "type": "boolean"
+          },
+          "LitigationIndicator": {
+            "type": "boolean"
+          },
+          "LossDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "LossType": {
+            "enum": [
+              "Auto",
+              "Property",
+              "Liability",
+              "Workers Comp",
+              "Travel"
+            ],
+            "type": "string",
+            "default": "Property"
+          },
+          "PolicyNumber": {
+            "type": "string"
+          },
+          "PolicyTypeName": {
+            "enum": [
+              "MW Personal Auto",
+              "Homeowners",
+              "Inland Marine",
+              "Personal Umbrella",
+              "Farm"
+            ],
+            "type": "string",
+            "default": "Homeowners"
+          },
+          "RemainingReserves": {
+            "type": "number",
+            "format": "double"
+          },
+          "RemainingReservesCurrency": {
+            "enum": [
+              "usd",
+              "eur",
+              "gbp",
+              "cad",
+              "aud",
+              "rub",
+              "jpy"
+            ],
+            "type": "string",
+            "default": "usd"
+          },
+          "Status": {
+            "enum": [
+              "Open",
+              "Closed",
+              "Draft",
+              "Archived"
+            ],
+            "type": "string",
+            "default": "Open"
+          },
+          "TotalIncurred": {
+            "type": "number",
+            "format": "double"
+          },
+          "TotalIncurredCurrency": {
+            "enum": [
+              "usd",
+              "eur",
+              "gbp",
+              "cad",
+              "aud",
+              "rub",
+              "jpy"
+            ],
+            "type": "string",
+            "default": "usd"
+          },
+          "LossCause": {
+            "type": "string"
+          },
+          "ReserveNumber": {
+            "type": "string"
+          },
+          "AtFaultIndicator": {
+            "type": "boolean"
+          },
+          "LossDescription": {
+            "type": "string"
+          },
+          "CatastropheCode": {
+            "type": "string"
+          },
+          "RiskElement": {
+            "type": "string"
+          },
+          "RiskItem": {
+            "type": "string"
+          },
+          "TotalPaid": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "microsoftAzureAdOAuthClientCredentials": {
+        "type": "oauth2",
+        "description": "This API uses Microsoft Azure Active Directory Client Credentials flow documented here https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://login.microsoftonline.com/28a6564d-337e-4b48-9467-9b3d48ce5255/oauth2/v2.0/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "microsoftAzureAdOAuthClientCredentials": []
+    }
+  ]
+}
